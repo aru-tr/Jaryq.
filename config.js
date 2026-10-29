@@ -1,0 +1,5 @@
+// Public connection settings only. Never put a service_role or secret key here.
+window.JARYQ_CONFIG = {
+  supabaseUrl: '',
+  supabasePublishableKey: ''
+};
