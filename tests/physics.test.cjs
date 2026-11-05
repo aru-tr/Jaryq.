@@ -23,10 +23,10 @@ test('grating central limit, diffraction orders and spectral averaging',()=>{
  assert.ok(P.intensity('diffraction',{...p,grating:true,position:x})>.8);
  for(const kind of ['interference','diffraction'])for(const r of P.sweep(kind,{...p,light:'white'}))assert.ok(Number.isFinite(r.ratio)&&r.ratio>=0&&r.ratio<=1);
 });
-test('Malus law and sweep endpoints, exact count, independent snapshots',()=>{
+test('Malus law and sweep endpoints, configurable sample count, independent snapshots',()=>{
  for(const [alpha,ratio]of [[0,1],[90,0],[180,1],[270,0],[360,1]])near(P.intensity('polarization',{...p,alpha}),ratio);
  for(const kind of ['interference','diffraction','polarization']){
-   const rows=P.sweep(kind,p);assert.equal(rows.length,25);near(rows[0].u,0);near(rows[24].u,1);
+   const rows=P.sweep(kind,p,1001);assert.equal(rows.length,1001);near(rows[0].u,0);near(rows[1000].u,1);
    assert.notEqual(rows[0],rows[1]);
  }
  const row=P.sample('polarization',{...p,alpha:60,imax:80});near(row.i,20);near(row.sq,.25);
@@ -37,4 +37,8 @@ test('recorded samples exclude application state and remain serializable',()=>{
  const row=P.sample('polarization',application);application.rows.push(row);application.data[2]=application.rows;
  assert.doesNotThrow(()=>JSON.stringify(application.data));
  assert.equal('data' in row,false);assert.equal('rows' in row,false);
+});
+
+test('sweep rejects invalid counts instead of returning incomplete measurements',()=>{
+ for(const count of [0,1,-1,2.5,NaN,Infinity])assert.throws(()=>P.sweep('interference',p,count),RangeError);
 });

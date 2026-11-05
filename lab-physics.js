@@ -35,7 +35,11 @@
     return {...settings, value, u:(value-lo)/(hi-lo), ratio, i:ratio*p.imax,
       ...(kind==='polarization'?{cos:Math.cos(radians(p.alpha)),sq:ratio,i0:p.imax}:{})};
   }
-  function sweep(kind,p) { const [lo,hi]=bounds(kind,p); return Array.from({length:25},(_,i)=>sample(kind,{...p,[parameter(kind)]:lo+(hi-lo)*i/24})); }
+  function sweep(kind,p,count=101) {
+    if(!Number.isSafeInteger(count)||count<2)throw new RangeError('At least two samples are required');
+    const [lo,hi]=bounds(kind,p);
+    return Array.from({length:count},(_,i)=>sample(kind,{...p,[parameter(kind)]:lo+(hi-lo)*i/(count-1)}));
+  }
   const api={intensity,monochromatic,bounds,parameter,sample,sweep};
   if (typeof module !== 'undefined' && module.exports) module.exports=api;
   else root.LabPhysics=api;
