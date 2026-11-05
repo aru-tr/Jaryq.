@@ -10,6 +10,9 @@ document.querySelector('#submissionForm').addEventListener('submit', async event
   const notes = {};
   document.querySelectorAll('[data-note]').forEach(el => sessionStorage.setItem(el.dataset.note, el.value));
   for (const key of ['observation0','conclusion0','observation1','conclusion1','polar',...Array.from({length:4},(_,i)=>['compare'+i+'a','compare'+i+'b']).flat()]) notes[key] = sessionStorage.getItem(key) || '';
+  for (const [index,key] of [[0,'interferenceMeasurements'],[1,'diffractionMeasurements']]) {
+    notes[key] = state.data[index].length ? JSON.stringify(state.data[index].map(({gap,angle,slit,distance,position,grating,light,wavelength,ratio}) => index===0?{gap,angle,light,wavelength,ratio}:{slit,distance,position,grating,light,wavelength,ratio})) : '';
+  }
   if (name.length < 2 || !schoolClass) { statusEl.textContent = 'Аты-жөні мен сыныбын толтырыңыз.'; return; }
   if (!Object.values(notes).some(v=>v.trim()) && !state.rows.length) { statusEl.textContent = 'Алдымен бақылау, қорытынды немесе өлшеу нәтижелерін енгізіңіз.'; return; }
   const button = document.querySelector('#sendWork'); button.disabled = true;
